@@ -3,33 +3,49 @@
 def main [
   --config: string
   --music-path: string
+  --query: string
 ] {
   let default_config_path = [$env.HOME .fzf-music.config.nuon] | path join
   let config_path = if $config == null { $default_config_path } else { $config }
 
   let flags = {
     music_path: $music_path
+    query: $query
   }
 
   let config_data = $config_path
   | load-config
   | merge ($flags | generate-config)
 
-  $config_data | play-track
+  $config_data | play
 }
 
 def generate-config [] {
   let config = $in
   let default_music_path = [$env.HOME Music] | path join
+  let default_query = 'track'
 
   {
     music_path: (if $config.music_path == null { $default_music_path } else { $config.music_path })
+    query: (if $config.query == null { $default_query } else { $config.query })
   }
 }
 
 def load-config [] {
   let config_path = $in
   if ($config_path | path exists) { open $config_path } else { {} }
+}
+
+def play [] {
+  let config = $in
+
+  match $config.query {
+    track => { $config | play-track },
+    _ => {
+      print $"error: ($config.query): invalid query"
+      exit 1
+    }
+  }
 }
 
 def play-track [] {
