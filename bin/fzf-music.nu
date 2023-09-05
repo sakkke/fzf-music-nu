@@ -21,13 +21,13 @@ def main [
 }
 
 def generate-config [] {
-  let config = $in
+  let flags = $in
   let default_music_path = [$env.HOME Music] | path join
   let default_query = 'track'
 
   {
-    music_path: (if $config.music_path == null { $default_music_path } else { $config.music_path })
-    query: (if $config.query == null { $default_query } else { $config.query })
+    music_path: (if $flags.music_path == null { $default_music_path } else { $flags.music_path })
+    query: (if $flags.query == null { $default_query } else { $flags.query })
   }
 }
 
