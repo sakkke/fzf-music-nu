@@ -40,11 +40,35 @@ def play [] {
   let config = $in
 
   match $config.query {
+    album => { $config | play-album },
     track => { $config | play-track },
     _ => {
       print $"error: ($config.query): invalid query"
       exit 1
     }
+  }
+}
+
+def play-album [] {
+  let config = $in
+  let album_paths = [$config.music_path, '*', '*'] | path join
+
+  let track_paths = ls $album_paths
+  | where type == dir
+  | get name
+  | to text
+  | fzf
+  | str trim
+  | ls $in
+  | get name
+
+  for -n $path in $track_paths {
+    if $path.index == 0 {
+      $path.item | rhythmbox-client --play-uri $in
+      continue
+    }
+
+    $path.item | rhythmbox-client --enqueue $in
   }
 }
 
