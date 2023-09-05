@@ -22,18 +22,21 @@ def main [
 
 def generate-config [] {
   let flags = $in
-  let default_music_path = [$env.HOME Music] | path join
-  let default_query = 'track'
-
-  {
-    music_path: (if $flags.music_path == null { $default_music_path } else { $flags.music_path })
-    query: (if $flags.query == null { $default_query } else { $flags.query })
-  }
+  mut config = {}
+  if $flags.music_path != null { $config = ($config | merge { music_path: $flags.music_path }) }
+  if $flags.query != null { $config = ($config | merge { query: $flags.query }) }
+  $config
 }
 
 def load-config [] {
   let config_path = $in
-  if ($config_path | path exists) { open $config_path } else { {} }
+
+  let config = {
+    music_path: ([$env.HOME Music] | path join)
+    query: 'track'
+  }
+
+  if ($config_path | path exists) { $config | merge (open $config_path) } else { $config }
 }
 
 def play [] {
