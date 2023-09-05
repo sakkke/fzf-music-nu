@@ -64,6 +64,7 @@ def play-album [] {
   | str trim
   | ls $in
   | get name
+  | sort -n
 
   for -n $path in $track_paths {
     if $path.index == 0 {
