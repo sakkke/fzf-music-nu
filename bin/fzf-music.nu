@@ -59,6 +59,7 @@ def play-album [] {
   let track_paths = ls $album_paths
   | where type == dir
   | get name
+  | sort -n
   | to text
   | fzf
   | str trim
@@ -82,6 +83,7 @@ def play-track [] {
 
   ls $track_paths
   | get name
+  | sort -n
   | to text
   | fzf
   | str trim
